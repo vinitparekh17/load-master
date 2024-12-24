@@ -1,0 +1,260 @@
+import{a,t as o}from"../chunks/disclose-version.DxP9oxcj.js";import"../chunks/legacy.BvhewkP7.js";import{n as r}from"../chunks/runtime.C2b0YXih.js";var i=o(`<!DOCTYPE html=""> <html lang="en"><head><meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>LoadMaster - Intelligent Load Balancing</title> <style>:root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+            --background-color: #f4f7f9;
+            --text-color: #333;
+            --header-height: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        nav {
+            margin-left: auto;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 20px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 24px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #fff;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .info-section {
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .info-section h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .info-section p {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 18px;
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            padding: 40px 20px;
+            background-color: #fff;
+        }
+
+        .feature {
+            flex-basis: calc(33.333% - 40px);
+            margin: 20px;
+            padding: 30px;
+            background-color: var(--background-color);
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .feature h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .feature p {
+            font-size: 16px;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .feature {
+                flex-basis: calc(50% - 40px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .feature {
+                flex-basis: 100%;
+            }
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+        }</style></head> <body><header><div class="logo">LoadMaster</div> <nav><a href="#home">Home</a> <a href="#info">About</a> <a href="#features">Features</a> <a href="#contact">Contact</a></nav></header> <section id="home" class="hero"><div class="particles" id="particles"></div> <div class="hero-content"><h1>Intelligent Load Balancing</h1> <p>Optimize your application performance and ensure high availability with LoadMaster's advanced load balancing solutions.</p> <a href="#" class="cta-button">Get Started</a></div></section> <section id="info" class="info-section"><h2>Why Choose LoadMaster?</h2> <p>LoadMaster is a cutting-edge load balancing solution designed to distribute network traffic efficiently across multiple servers. Our intelligent algorithms ensure optimal resource utilization, improved response times, and enhanced reliability for your applications.</p></section> <section id="features" class="features"><div class="feature"><h3>Smart Traffic Distribution</h3> <p>Automatically route requests to the most available and responsive servers in your cluster.</p></div> <div class="feature"><h3>Real-time Health Monitoring</h3> <p>Continuously monitor server health and automatically redirect traffic from failing nodes.</p></div> <div class="feature"><h3>Scalability</h3> <p>Easily scale your infrastructure to handle increasing loads without compromising performance.</p></div></section> <footer id="contact"><p>&copy; 2024 LoadMaster. All rights reserved.</p></footer> <script>
+        // Particle animation
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 50;
+
+        for (let i = 0; i < particleCount; i++) {
+            createParticle();
+        }
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            const size = Math.random() * 5 + 2;
+            particle.style.width = \`\${size}px\`;
+            particle.style.height = \`\${size}px\`;
+            
+            const startPositionX = Math.random() * 100;
+            const startPositionY = Math.random() * 100;
+            particle.style.left = \`\${startPositionX}%\`;
+            particle.style.top = \`\${startPositionY}%\`;
+            
+            particlesContainer.appendChild(particle);
+            
+            animateParticle(particle);
+        }
+
+        function animateParticle(particle) {
+            const animation = particle.animate([
+                { transform: 'translate(0, 0)' },
+                { transform: \`translate(\${Math.random() * 200 - 100}px, \${Math.random() * 200 - 100}px)\` }
+            ], {
+                duration: Math.random() * 3000 + 2000,
+                direction: 'alternate',
+                iterations: Infinity,
+                easing: 'ease-in-out'
+            });
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Animate features on scroll
+        const features = document.querySelectorAll('.feature');
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        features.forEach(feature => {
+            feature.style.opacity = 0;
+            feature.style.transform = 'translateY(50px)';
+            feature.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(feature);
+        });
+    <\/script></body></html>`,1);function c(e){var t=i();r(2),a(e,t)}export{c as component};

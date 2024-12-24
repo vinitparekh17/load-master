@@ -1,0 +1,24 @@
+# This is the example config file for simple lb & reverse proxy
+# shard_count: 1
+# timeouts:
+#     client: 5s
+#     connection: 500ms
+#     server: 5s
+# upstreams:
+#     - name: backend1
+#       addr:
+#         - 192.168.1.101
+#         - 192.168.1.102
+#     - name: backend2
+#       addr:
+#         - 192.168.1.201
+#         - 192.168.1.202
+# locations:
+#     - path: /api
+#       upstream: backend1
+#     - path: /static
+#       root: /var/www/static
+# buffer_size: 8192
+# access_log: /var/log/lb/access.log
+# error_log: /var/log/lb/error.log
+# load_balancing_alg: round_robin

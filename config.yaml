@@ -1,0 +1,15 @@
+server:
+    addr: :8080
+    read_timeout: 5s
+    write_timeout: 5s
+    idle_timeout: 500ms
+shard_count: 8
+locations:
+    - path: /
+      root: ./build
+      index_file: index.html
+      error_file: error.html
+buffer_size: 8192
+access_log: /var/log/slb/access.log
+error_log: /var/log/slb/error.log
+load_balancing_alg: round_robin
