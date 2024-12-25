@@ -1,12 +1,12 @@
 server:
-    addr: :8080
+    addr: :80
     read_timeout: 5s
     write_timeout: 5s
     idle_timeout: 500ms
 shard_count: 8
 locations:
     - path: /
-      root: ./build
+      root: ./static
       index_file: index.html
       error_file: error.html
 buffer_size: 8192

@@ -15,7 +15,7 @@ var SlbConfig SlbConf
 
 type SlbConf struct {
 	Server           serverConf  `yaml:"server" validate:"required"`
-	ShardCount       int16       `yaml:"shard_count" validate:"required,gte=1"`
+	ShardCount       int         `yaml:"shard_count" validate:"required,gte=1"`
 	Upstreams        *[]upstream `yaml:"upstreams,omitempty" validate:"dive, omitempty"`
 	Locations        []location  `yaml:"locations" validate:"required,dive"`
 	BufferSize       int32       `yaml:"buffer_size" validate:"required,gte=4096"`
@@ -66,10 +66,16 @@ func writeBaseConfig() {
 		AccessLog:        "/var/log/slb/access.log",
 		ErrorLog:         "/var/log/slb/error.log",
 		LoadBalancingAlg: "round_robin",
+		Upstreams: &[]upstream{
+			{
+				Name: "backend-1",
+				Addr: []string{"127.0.0.1:8000", "127.0.0.1:8001"},
+			},
+		},
 		Locations: []location{
 			{
 				Path:      "/",
-				Root:      "/build",
+				Root:      "./static",
 				IndexFile: "index.html",
 				ErrorFile: "error.html",
 			},

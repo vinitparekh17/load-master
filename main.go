@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"sync"
 	"syscall"
 )
@@ -17,6 +18,11 @@ func main() {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
 
+	if SlbConfig.ShardCount <= runtime.NumCPU() {
+		runtime.GOMAXPROCS(SlbConfig.ShardCount)
+	}
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	wg := &sync.WaitGroup{}
 	lb := NewLb(ctx)
 
@@ -26,6 +32,14 @@ func main() {
 		if err := lb.Run(ctx); err != nil && err != http.ErrServerClosed {
 			log.Printf("Server error: %v", err)
 		}
+	}()
+
+	shardManager := NewShardManager()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		shardManager.Run(ctx)
 	}()
 
 	go func() {

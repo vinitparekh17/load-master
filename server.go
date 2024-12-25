@@ -35,7 +35,7 @@ func (lb *LbServer) Run(ctx context.Context) error {
 	errChan := make(chan error, 1)
 
 	go func() {
-    lb.Serve()
+		lb.Serve()
 		lb.httpServer.Handler = lb.mux
 		errChan <- lb.httpServer.ListenAndServe()
 	}()
@@ -56,8 +56,8 @@ func (lb *LbServer) Run(ctx context.Context) error {
 func (lb *LbServer) Serve() {
 	for _, location := range SlbConfig.Locations {
 		lb.mux.Handle(location.Path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-      filePath := filepath.Join(location.Root, r.URL.Path)
-      if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			filePath := filepath.Join(location.Root, r.URL.Path)
+			if _, err := os.Stat(filePath); os.IsNotExist(err) {
 				errPage := filepath.Join(location.Root, location.ErrorFile)
 				http.ServeFile(w, r, errPage)
 				return
