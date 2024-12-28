@@ -1,4 +1,4 @@
-module github.com/vinitparekh17/simple-lb
+module github.com/vinitparekh17/load-master
 
 go 1.23.2
 

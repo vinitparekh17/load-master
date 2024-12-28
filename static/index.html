@@ -1,24 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" href="./favicon.png" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		
-		<link href="./_app/immutable/assets/0.DI42D95_.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/entry/start.-qc3XV-6.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/entry.CndyrISf.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/runtime.C2b0YXih.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index-client.m3wvKIcR.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.CDLTr9jp.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/render.O7AYlHrM.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/disclose-version.DxP9oxcj.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/0.XSivHqxM.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/2.Hlmj5gVY.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/legacy.BvhewkP7.js">
-	</head>
-	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents"><!--[--><!--[--><!----><!----><!DOCTYPE html=""> <html lang="en"><head><meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>LoadMaster - Intelligent Load Balancing</title> <style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoadMaster - Intelligent Load Balancing</title>
+    <style>
         :root {
             --primary-color: #4a90e2;
             --secondary-color: #f39c12;
@@ -42,7 +29,7 @@
 
         header {
             background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
             left: 0;
@@ -115,7 +102,7 @@
 
         .cta-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .info-section {
@@ -155,7 +142,7 @@
 
         .feature:hover {
             transform: translateY(-10px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
         .feature h3 {
@@ -209,7 +196,52 @@
             background-color: rgba(255, 255, 255, 0.5);
             border-radius: 50%;
         }
-    </style></head> <body><header><div class="logo">LoadMaster</div> <nav><a href="#home">Home</a> <a href="#info">About</a> <a href="#features">Features</a> <a href="#contact">Contact</a></nav></header> <section id="home" class="hero"><div class="particles" id="particles"></div> <div class="hero-content"><h1>Intelligent Load Balancing</h1> <p>Optimize your application performance and ensure high availability with LoadMaster's advanced load balancing solutions.</p> <a href="#" class="cta-button">Get Started</a></div></section> <section id="info" class="info-section"><h2>Why Choose LoadMaster?</h2> <p>LoadMaster is a cutting-edge load balancing solution designed to distribute network traffic efficiently across multiple servers. Our intelligent algorithms ensure optimal resource utilization, improved response times, and enhanced reliability for your applications.</p></section> <section id="features" class="features"><div class="feature"><h3>Smart Traffic Distribution</h3> <p>Automatically route requests to the most available and responsive servers in your cluster.</p></div> <div class="feature"><h3>Real-time Health Monitoring</h3> <p>Continuously monitor server health and automatically redirect traffic from failing nodes.</p></div> <div class="feature"><h3>Scalability</h3> <p>Easily scale your infrastructure to handle increasing loads without compromising performance.</p></div></section> <footer id="contact"><p>© 2024 LoadMaster. All rights reserved.</p></footer> <script>
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">LoadMaster</div>
+        <!-- nav item -->
+    </header>
+
+    <section id="home" class="hero">
+        <div class="particles" id="particles"></div>
+        <div class="hero-content">
+            <h1>Intelligent Load Balancing</h1>
+            <p>Optimize your application performance and ensure high availability with LoadMaster's advanced load
+                balancing solutions.</p>
+            <a href="#" class="cta-button">Get Started</a>
+        </div>
+    </section>
+
+    <section id="info" class="info-section">
+        <h2>Why Choose LoadMaster?</h2>
+        <p>LoadMaster is a cutting-edge load balancing solution designed to distribute network traffic efficiently
+            across multiple servers. Our intelligent algorithms ensure optimal resource utilization, improved response
+            times, and enhanced reliability for your applications.</p>
+    </section>
+
+    <section id="features" class="features">
+        <div class="feature">
+            <h3>Smart Traffic Distribution</h3>
+            <p>Automatically route requests to the most available and responsive servers in your cluster.</p>
+        </div>
+        <div class="feature">
+            <h3>Real-time Health Monitoring</h3>
+            <p>Continuously monitor server health and automatically redirect traffic from failing nodes.</p>
+        </div>
+        <div class="feature">
+            <h3>Scalability</h3>
+            <p>Easily scale your infrastructure to handle increasing loads without compromising performance.</p>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <p>&copy; 2023 LoadMaster. All rights reserved.</p>
+    </footer>
+
+    <script>
         // Particle animation
         const particlesContainer = document.getElementById('particles');
         const particleCount = 50;
@@ -221,18 +253,18 @@
         function createParticle() {
             const particle = document.createElement('div');
             particle.classList.add('particle');
-            
+
             const size = Math.random() * 5 + 2;
             particle.style.width = `${size}px`;
             particle.style.height = `${size}px`;
-            
+
             const startPositionX = Math.random() * 100;
             const startPositionY = Math.random() * 100;
             particle.style.left = `${startPositionX}%`;
             particle.style.top = `${startPositionY}%`;
-            
+
             particlesContainer.appendChild(particle);
-            
+
             animateParticle(particle);
         }
 
@@ -279,29 +311,7 @@
             feature.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
             observer.observe(feature);
         });
-    </script></body></html><!----><!----><!----><!--]--> <!--[!--><!--]--><!--]-->
-			
-			<script>
-				{
-					__sveltekit_kgi9jo = {
-						base: new URL(".", location).pathname.slice(0, -1)
-					};
+    </script>
+</body>
 
-					const element = document.currentScript.parentElement;
-
-					Promise.all([
-						import("./_app/immutable/entry/start.-qc3XV-6.js"),
-						import("./_app/immutable/entry/app.CDLTr9jp.js")
-					]).then(([kit, app]) => {
-						kit.start(app, element, {
-							node_ids: [0, 2],
-							data: [null,null],
-							form: null,
-							error: null
-						});
-					});
-				}
-			</script>
-		</div>
-	</body>
 </html>

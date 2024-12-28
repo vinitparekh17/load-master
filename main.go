@@ -34,12 +34,10 @@ func main() {
 		}
 	}()
 
-	shardManager := NewShardManager()
-
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		shardManager.Run(ctx)
+		lb.shardManager.Run(ctx)
 	}()
 
 	go func() {
