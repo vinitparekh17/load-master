@@ -4,24 +4,30 @@ import (
 	"errors"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"gopkg.in/yaml.v3"
 )
 
-const DEFAULT_CONF_PATH = "./config.yaml"
-
+var (
+	DefaultConfPath       = filepath.Base("config.yaml")
+	DefaultStaticRootPath = filepath.Base("static")
+	DefaultIndexFile      = filepath.Join(DefaultStaticRootPath, "index.html")
+	DefaultErrorFile      = filepath.Join(DefaultStaticRootPath, "index.html")
+)
 var SlbConfig SlbConf
 
 type SlbConf struct {
 	Server           serverConf  `yaml:"server" validate:"required"`
 	ShardCount       int         `yaml:"shard_count" validate:"required,gte=1"`
-	Upstreams        *[]upstream `yaml:"upstreams,omitempty" validate:"dive, omitempty"`
+	Upstreams        *[]Upstream `yaml:"upstreams,omitempty" validate:"dive, omitempty"`
 	Locations        []location  `yaml:"locations" validate:"required,dive"`
 	BufferSize       int32       `yaml:"buffer_size" validate:"required,gte=4096"`
 	AccessLog        string      `yaml:"access_log" validate:"required,filepath"`
 	ErrorLog         string      `yaml:"error_log" validate:"required,filepath"`
 	LoadBalancingAlg string      `yaml:"load_balancing_alg" validate:"required,oneof=round_robin least_conn"`
+	ErrorFile        string      `yaml:"error_file"`
 }
 
 type serverConf struct {
@@ -31,8 +37,9 @@ type serverConf struct {
 	IdleTimeout  time.Duration `yaml:"idle_timeout,omitempty"`
 }
 
-type upstream struct {
+type Upstream struct {
 	Name string   `yaml:"name" validate:"required"`
+	Path string   `yaml:"path" validate:"required"`
 	Addr []string `yaml:"addr" validate:"required,min=1,dive,hostname|ipv4"`
 }
 
@@ -41,11 +48,10 @@ type location struct {
 	Upstream  *string `yaml:"upstream,omitempty" validate:"omitempty"`
 	Root      string  `yaml:"root,omitempty" validate:"omitempty,dirpath"`
 	IndexFile string  `yaml:"index_file"`
-	ErrorFile string  `yaml:"error_file"`
 }
 
 func init() {
-	_, err := os.Stat(DEFAULT_CONF_PATH)
+	_, err := os.Stat(DefaultConfPath)
 	if errors.Is(err, os.ErrNotExist) {
 		writeBaseConfig()
 	} else {
@@ -66,7 +72,7 @@ func writeBaseConfig() {
 		AccessLog:        "/var/log/slb/access.log",
 		ErrorLog:         "/var/log/slb/error.log",
 		LoadBalancingAlg: "round_robin",
-		Upstreams: &[]upstream{
+		Upstreams: &[]Upstream{
 			{
 				Name: "backend-1",
 				Addr: []string{"127.0.0.1:8000", "127.0.0.1:8001"},
@@ -77,12 +83,11 @@ func writeBaseConfig() {
 				Path:      "/",
 				Root:      "./static",
 				IndexFile: "index.html",
-				ErrorFile: "error.html",
 			},
 		},
 	}
 
-	f, err := os.OpenFile(DEFAULT_CONF_PATH, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	f, err := os.OpenFile(DefaultConfPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	checkErr(err)
 	defer f.Close()
 
@@ -92,7 +97,7 @@ func writeBaseConfig() {
 }
 
 func readConfigFile() {
-	file, err := os.OpenFile(DEFAULT_CONF_PATH, os.O_RDONLY, 0600)
+	file, err := os.OpenFile(DefaultConfPath, os.O_RDONLY, 0600)
 	checkErr(err)
 
 	dec := yaml.NewDecoder(file)
@@ -104,8 +109,4 @@ func checkErr(err error) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-}
-
-func strPtr(s string) *string {
-	return &s
 }
