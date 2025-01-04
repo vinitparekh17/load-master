@@ -2,22 +2,14 @@ package main
 
 import (
 	"context"
-	"log/slog"
 	"net/http"
-	"os"
-	"path/filepath"
 	"time"
-)
-
-const (
-	SLB_PORT = 80 // simple load balancer's port
 )
 
 type LbServer struct {
 	httpServer   *http.Server
-	mux          *http.ServeMux
 	shardManager *ShardManager
-	logger       slog.Logger
+	errChan      chan error
 	shutdownChan chan struct{}
 }
 
@@ -31,44 +23,26 @@ func NewLb(ctx context.Context) *LbServer {
 			MaxHeaderBytes: 1 << 20, // 1 MB
 		},
 		shardManager: NewShardManager(),
-		mux:          http.NewServeMux(),
-		logger:       *slog.New(slog.NewTextHandler(os.Stdout, nil)),
+		errChan:      make(chan error),
 		shutdownChan: make(chan struct{}),
 	}
 }
 func (lb *LbServer) Run(ctx context.Context) error {
-	errChan := make(chan error, 1)
+	lb.httpServer.Handler = lb.shardManager.UseRouter()
 
 	go func() {
-		lb.ServeStaticHandler()
-		lb.httpServer.Handler = lb.mux
-		errChan <- lb.httpServer.ListenAndServe()
+		lb.errChan <- lb.httpServer.ListenAndServe()
 	}()
 
 	select {
 	case <-ctx.Done():
-		shutdownCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		shutdownCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
 		defer cancel()
 		if err := lb.httpServer.Shutdown(shutdownCtx); err != nil {
 			return err
 		}
 		return nil
-	case err := <-errChan:
+	case err := <-lb.errChan:
 		return err
-	}
-}
-
-func (lb *LbServer) ServeStaticHandler() {
-	for _, location := range SlbConfig.Locations {
-		lb.mux.Handle(location.Path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			filePath := filepath.Join(location.Root, r.URL.Path)
-			if _, err := os.Stat(filePath); os.IsNotExist(err) {
-				errPage := filepath.Join(location.Root, DefaultErrorFile)
-				http.ServeFile(w, r, errPage)
-				return
-			}
-
-			http.ServeFile(w, r, filePath)
-		}))
 	}
 }

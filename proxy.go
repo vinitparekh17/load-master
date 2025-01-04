@@ -1,51 +1,49 @@
 package main
 
 import (
-	"log/slog"
 	"net/http"
-	"strings"
+	"sync"
+	"time"
 )
 
-type ProxyHandler struct {
-	sm *ShardManager
+type ProxyRequest struct {
+	OriginalRequest *http.Request
+	ResponseWriter  http.ResponseWriter
+	Endpoint        string
+	done            *sync.WaitGroup
 }
 
-func NewProxyHandler(sm *ShardManager) *ProxyHandler {
-	return &ProxyHandler{
-		sm: sm,
+func (sm *ShardManager) handleProxyReq(endpoint string, w http.ResponseWriter, r *http.Request) {
+	sm.wg.Add(1)
+
+	proxyReq := ProxyRequest{
+		OriginalRequest: r,
+		ResponseWriter:  w,
+		Endpoint:        endpoint,
+		done:            &sm.wg,
 	}
-}
 
-// Handle is the entry point of the load balancer which transfers client req to ShardManager
-func (h *ProxyHandler) Handle(w http.ResponseWriter, r *http.Request) {
-
-	upstream := h.findMatchingUpstream(r.URL.Path)
-	if upstream == nil {
-		http.ServeFile(w, r, SlbConfig.ErrorFile)
-		slog.Error("upstream addr not available at ", slog.String("path", r.URL.Path))
+	select {
+	case sm.globalProxyReqChan <- proxyReq:
+		// Successfully sent to the channel
+	case <-r.Context().Done():
+		// Client canceled the request, exit early
+		http.Error(w, "Request canceled", http.StatusRequestTimeout)
+		sm.wg.Done()
+		return
+	case <-time.After(5 * time.Second):
+		// Optional timeout
+		http.Error(w, "Gateway timeout", http.StatusGatewayTimeout)
+		sm.wg.Done()
 		return
 	}
 
-	h.sm.globalProxyReqChan <- &ProxyRequest{
-		OriginalRequest: r,
-		ResponseWriter:  w,
-		UpstreamAddrs:   upstream.Addr,
+	// Wait for the processing to complete, but check for context cancellation
+	select {
+	case <-r.Context().Done():
+		http.Error(w, "Request canceled", http.StatusRequestTimeout)
+		return
+	case <-time.After(5 * time.Second): // optional timeout
+		sm.wg.Wait() // Wait for all work to finish
 	}
-}
-
-func (h *ProxyHandler) findMatchingUpstream(path string) *Upstream {
-	var matchedUpstream *Upstream
-	longestMatch := -1
-
-	for i, upstream := range *SlbConfig.Upstreams {
-		if strings.HasPrefix(path, upstream.Path) {
-			pathLen := len(upstream.Path)
-			if pathLen > longestMatch {
-				longestMatch = pathLen
-				matchedUpstream = &(*SlbConfig.Upstreams)[i]
-			}
-		}
-	}
-
-	return matchedUpstream
 }

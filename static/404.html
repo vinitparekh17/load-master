@@ -198,21 +198,6 @@
             <h1>Oops! Page Not Found</h1>
             <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
             <a href="/" class="cta-button">Return to Homepage</a>
-
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Search our site..." id="searchInput">
-                <button class="search-button" id="searchButton">Search</button>
-            </div>
-
-            <div class="suggested-pages">
-                <h2>You might be looking for:</h2>
-                <ul id="suggestedPages">
-                    <li><a href="/features">LoadMaster Features</a></li>
-                    <li><a href="/pricing">Pricing Plans</a></li>
-                    <li><a href="/support">Support Center</a></li>
-                    <li><a href="/docs">Documentation</a></li>
-                </ul>
-            </div>
         </div>
     </main>
 
@@ -229,53 +214,7 @@
             errorCode.style.transform = `rotate(${degree}deg)`;
             requestAnimationFrame(rotateErrorCode);
         }
-        rotateErrorCode();
-
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-        const suggestedPages = document.getElementById('suggestedPages');
-
-        const pages = [
-            { title: 'LoadMaster Features', url: '/features' },
-            { title: 'Pricing Plans', url: '/pricing' },
-            { title: 'Support Center', url: '/support' },
-            { title: 'Documentation', url: '/docs' },
-            { title: 'About Us', url: '/about' },
-            { title: 'Contact', url: '/contact' },
-            { title: 'Blog', url: '/blog' },
-            { title: 'Case Studies', url: '/case-studies' }
-        ];
-
-        function performSearch() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const filteredPages = pages.filter(page => 
-                page.title.toLowerCase().includes(searchTerm)
-            );
-
-            suggestedPages.innerHTML = '';
-            filteredPages.forEach(page => {
-                const li = document.createElement('li');
-                const a = document.createElement('a');
-                a.href = page.url;
-                a.textContent = page.title;
-                li.appendChild(a);
-                suggestedPages.appendChild(li);
-            });
-
-            if (filteredPages.length === 0) {
-                const li = document.createElement('li');
-                li.textContent = 'No results found';
-                suggestedPages.appendChild(li);
-            }
-        }
-
-        searchButton.addEventListener('click', performSearch);
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
+        rotateErrorCode();       
     </script>
 </body>
 </html>

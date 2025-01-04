@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,6 +14,14 @@ import (
 )
 
 func main() {
+	asciiArt := `
+    _                     _ __  __           _            
+   | |    ___   __ _   __| |  \/  | __ _ ___| |_ ___ _ __ 
+   | |   / _ \ / _` + "`" + ` | / _` + "`" + ` | |\/| |/ _` + "`" + ` / __| __/ _ \ '__|
+   | |__| (_) | (_| || (_| | |  | | (_| \__ \ ||  __/ |   
+   |_____\___/ \__,_| \__,_|_|  |_|\__,_|___/\__\___|_|  
+	 `
+	fmt.Println(asciiArt)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -23,14 +33,14 @@ func main() {
 	}
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	wg := &sync.WaitGroup{}
+	wg := new(sync.WaitGroup)
 	lb := NewLb(ctx)
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		if err := lb.Run(ctx); err != nil && err != http.ErrServerClosed {
-			log.Printf("Server error: %v", err)
+			log.Fatalf("Server error: %v", err.Error())
 		}
 	}()
 
@@ -40,12 +50,14 @@ func main() {
 		lb.shardManager.Run(ctx)
 	}()
 
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		<-sig
-		log.Println("Shutting down gracefully...")
+		slog.Info("Shutting down gracefully...")
 		cancel()
 	}()
 
 	wg.Wait()
-	log.Println("Server exited")
+	slog.Info("Server exited")
 }

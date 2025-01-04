@@ -22,15 +22,9 @@ type ShardManager struct {
 	shardCounter       int // will be used to keep track of the current shard index for req. distribution
 	wg                 sync.WaitGroup
 	globalErrChan      chan error
-	globalProxyReqChan chan *ProxyRequest
+	globalProxyReqChan chan ProxyRequest
 	mu                 sync.Mutex
 	signalChan         chan os.Signal
-}
-
-type ProxyRequest struct {
-	OriginalRequest *http.Request
-	ResponseWriter  http.ResponseWriter
-	UpstreamAddrs   []string
 }
 
 func NewShardManager() *ShardManager {
@@ -43,7 +37,7 @@ func NewShardManager() *ShardManager {
 	return &ShardManager{
 		shards:             shards,
 		globalErrChan:      make(chan error),
-		globalProxyReqChan: make(chan *ProxyRequest),
+		globalProxyReqChan: make(chan ProxyRequest),
 		signalChan:         make(chan os.Signal, 1),
 	}
 }
@@ -55,12 +49,13 @@ func (sm *ShardManager) Run(ctx context.Context) {
 	defer cancelShardCtx()
 
 	//starting shards
-	for i := range sm.shards {
+	for i := 0; i < len(sm.shards); i++ {
 		sm.wg.Add(1)
+		shard := &sm.shards[i] // Create a copy of the pointer to avoid capturing the loop variable.
 		go func(s *Shard) {
 			defer sm.wg.Done()
 			s.Run(shardCtx)
-		}(&sm.shards[i])
+		}(shard)
 	}
 
 	sm.wg.Add(1)
@@ -82,31 +77,15 @@ func (sm *ShardManager) Run(ctx context.Context) {
 		slog.Info("receieved termination signal...")
 	}
 
-	cancelShardCtx()
-	close(sm.globalErrChan)
 	close(sm.globalProxyReqChan)
-
-	shutdownCtx, cancelShutdown := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancelShutdown()
-
-	done := make(chan struct{})
-	go func() {
-		sm.wg.Wait()
-		close(done)
-	}()
-
-	select {
-	case <-done:
-		slog.Info("shutting down shards gracefully")
-	case <-shutdownCtx.Done():
-		slog.Warn("shards shutdown timeout exceeded")
-	}
+	sm.wg.Wait()
 }
 
-func (sm *ShardManager) handleError(shardCtx context.Context) {
+func (sm *ShardManager) handleError(ctx context.Context) {
 	for {
 		select {
-		case <-shardCtx.Done():
+		case <-ctx.Done():
+			close(sm.globalErrChan)
 			return
 		case err, ok := <-sm.globalErrChan:
 			if !ok {
@@ -116,15 +95,33 @@ func (sm *ShardManager) handleError(shardCtx context.Context) {
 		}
 	}
 }
-
-// DistributeProxy distributes the incoming req across shards to process request
 func (sm *ShardManager) DistributeProxy(shardCtx context.Context) {
 	for proxyReq := range sm.globalProxyReqChan {
-		// using round robin algo to distribute req across chards evenly
-		sm.mu.Lock()
-		index := sm.shardCounter % len(sm.shards)
-		sm.shardCounter = (sm.shardCounter + 1) % len(sm.shards)
-		sm.shards[index].proxyReqChan <- proxyReq
-		sm.mu.Unlock()
+		// Check if the request context is already canceled
+		if proxyReq.OriginalRequest.Context().Err() != nil {
+			slog.Info("Request already canceled during distribution",
+				"error", proxyReq.OriginalRequest.Context().Err())
+			continue
+		}
+
+		var shardIndex int
+		if len(sm.shards) > 1 {
+			sm.mu.Lock()
+			shardIndex = sm.shardCounter % len(sm.shards)
+			sm.shardCounter = (sm.shardCounter + 1) % len(sm.shards)
+			sm.mu.Unlock()
+		}
+
+		// Send to shard with context awareness
+		select {
+		case sm.shards[shardIndex].proxyReqChan <- proxyReq:
+			// Successfully forwarded to shard
+		case <-proxyReq.OriginalRequest.Context().Done():
+			slog.Info("Request canceled while forwarding to shard",
+				"error", proxyReq.OriginalRequest.Context().Err())
+		case <-time.After(2 * time.Second):
+			slog.Error("Timeout forwarding to shard")
+			http.Error(proxyReq.ResponseWriter, "Internal Server Error", http.StatusInternalServerError)
+		}
 	}
 }

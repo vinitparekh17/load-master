@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - LoadMaster</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+            --background-color: #f4f7f9;
+            --text-color: #333;
+            --header-height: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .error-container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .error-code::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(74, 144, 226, 0.1) 0%, rgba(244, 247, 249, 0) 70%);
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 100px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+        }
+
+        .server-status {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .status-light.green {
+            background-color: #2ecc71;
+        }
+
+        .status-light.red {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">LoadMaster</div>
+    </header>
+
+    <main>
+        <div class="error-container">
+            <div class="error-code" id="errorCode">500</div>
+            <h1>Oops! Something went wrong</h1>
+            <p>We're experiencing some technical difficulties. Our team has been notified and is working on resolving the issue.</p>
+            <a href="/" class="cta-button">Return to Homepage</a>
+
+            <div class="server-status">
+                <h2>Server Status</h2>
+                <div id="serverStatus"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 LoadMaster. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Animate error code
+        const errorCode = document.getElementById('errorCode');
+        let degree = 0;
+        function rotateErrorCode() {
+            degree = (degree + 1) % 360;
+            errorCode.style.transform = `rotate(${degree}deg)`;
+            requestAnimationFrame(rotateErrorCode);
+        }
+        rotateErrorCode();
+
+        // Simulated server status
+        const serverStatus = document.getElementById('serverStatus');
+        const servers = [
+            { name: 'Server 1', status: 'online' },
+            { name: 'Server 2', status: 'online' },
+            { name: 'Server 3', status: 'offline' },
+            { name: 'Server 4', status: 'online' }
+        ];
+
+        function updateServerStatus() {
+            serverStatus.innerHTML = '';
+            servers.forEach(server => {
+                const statusItem = document.createElement('div');
+                statusItem.classList.add('status-item');
+                const statusLight = document.createElement('span');
+                statusLight.classList.add('status-light');
+                statusLight.classList.add(server.status === 'online' ? 'green' : 'red');
+                statusItem.innerHTML = `
+                    <span>${server.name}: ${statusLight.outerHTML} ${server.status}</span>
+                    <span>${server.status === 'online' ? 'Operational' : 'Down'}</span>
+                `;
+                serverStatus.appendChild(statusItem);
+            });
+        }
+
+        updateServerStatus();
+
+        // Simulate changing server status
+        setInterval(() => {
+            const randomServer = servers[Math.floor(Math.random() * servers.length)];
+            randomServer.status = randomServer.status === 'online' ? 'offline' : 'online';
+            updateServerStatus();
+        }, 5000);
+    </script>
+</body>
+</html>
