@@ -28,7 +28,7 @@ type Config struct {
 }
 
 type serverConf struct {
-	Addr         string        `yaml:"addr" validate:"required"`
+	Listen       string        `yaml:"listen" validate:"required"`
 	ReadTimeout  time.Duration `yaml:"read_timeout,omitempty"`
 	WriteTimeout time.Duration `yaml:"write_timeout,omitempty"`
 	IdleTimeout  time.Duration `yaml:"idle_timeout,omitempty"`
@@ -56,7 +56,7 @@ func init() {
 func writeBaseConfig() {
 	SlbConfig = &Config{
 		Server: serverConf{
-			Addr:         ":8080",
+			Listen:       ":8080",
 			ReadTimeout:  5 * time.Second,
 			IdleTimeout:  500 * time.Millisecond,
 			WriteTimeout: 5 * time.Second,

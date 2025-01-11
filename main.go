@@ -47,12 +47,6 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		lb.shardManager.Run(ctx)
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
 		<-sig
 		slog.Info("Shutting down gracefully...")
 		cancel()

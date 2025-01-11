@@ -8,7 +8,6 @@ import (
 
 type LbServer struct {
 	httpServer   *http.Server
-	shardManager *ShardManager
 	errChan      chan error
 	shutdownChan chan struct{}
 }
@@ -16,19 +15,18 @@ type LbServer struct {
 func NewLb(ctx context.Context) *LbServer {
 	return &LbServer{
 		httpServer: &http.Server{
-			Addr:           SlbConfig.Server.Addr,
+			Addr:           SlbConfig.Server.Listen,
 			ReadTimeout:    SlbConfig.Server.ReadTimeout,
 			WriteTimeout:   SlbConfig.Server.WriteTimeout,
 			IdleTimeout:    SlbConfig.Server.IdleTimeout,
 			MaxHeaderBytes: 1 << 20, // 1 MB
+			Handler:        NewHandler(ctx),
 		},
-		shardManager: NewShardManager(),
 		errChan:      make(chan error),
 		shutdownChan: make(chan struct{}),
 	}
 }
 func (lb *LbServer) Run(ctx context.Context) error {
-	lb.httpServer.Handler = lb.shardManager.UseRouter()
 
 	go func() {
 		lb.errChan <- lb.httpServer.ListenAndServe()
