@@ -10,7 +10,7 @@ func validateConfig() {
 	validate := validator.New()
 	validate.RegisterValidation("locationsMap", validateLocations)
 
-	if err := validate.Struct(SlbConfig); err != nil {
+	if err := validate.Struct(Config); err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
 			log.Fatalf("Validation failed: Field '%s', Condition '%s'\n", err.Namespace(), err.Tag())
 		}

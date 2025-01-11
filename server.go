@@ -15,10 +15,10 @@ type LbServer struct {
 func NewLb(ctx context.Context) *LbServer {
 	return &LbServer{
 		httpServer: &http.Server{
-			Addr:           SlbConfig.Server.Listen,
-			ReadTimeout:    SlbConfig.Server.ReadTimeout,
-			WriteTimeout:   SlbConfig.Server.WriteTimeout,
-			IdleTimeout:    SlbConfig.Server.IdleTimeout,
+			Addr:           Config.Server.Listen,
+			ReadTimeout:    Config.Server.ReadTimeout,
+			WriteTimeout:   Config.Server.WriteTimeout,
+			IdleTimeout:    Config.Server.IdleTimeout,
 			MaxHeaderBytes: 1 << 20, // 1 MB
 			Handler:        NewHandler(ctx),
 		},

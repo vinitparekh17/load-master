@@ -17,9 +17,10 @@ var (
 	DefaultError404Page   = filepath.Join(DefaultStaticRootPath, "404.html")
 	DefaultError500Page   = filepath.Join(DefaultStaticRootPath, "500.html")
 )
-var SlbConfig *Config
 
-type Config struct {
+var Config *LbConfig
+
+type LbConfig struct {
 	Server           serverConf          `yaml:"server" validate:"required"`
 	ShardCount       int                 `yaml:"shard_count" validate:"required,gte=1"`
 	Locations        map[string]location `yaml:"locations" validate:"required,locationsMap"`
@@ -34,13 +35,13 @@ type serverConf struct {
 	IdleTimeout  time.Duration `yaml:"idle_timeout,omitempty"`
 }
 
-type Upstream struct {
+type upstream struct {
 	Name string   `yaml:"name" validate:"required"`
 	Addr []string `yaml:"addr" validate:"required,min=1,dive,hostname|ipv4"`
 }
 
 type location struct {
-	Upstream *Upstream `yaml:"upstream,omitempty" validate:"omitempty"`
+	Upstream *upstream `yaml:"upstream,omitempty" validate:"omitempty"`
 }
 
 func init() {
@@ -54,7 +55,7 @@ func init() {
 }
 
 func writeBaseConfig() {
-	SlbConfig = &Config{
+	Config = &LbConfig{
 		Server: serverConf{
 			Listen:       ":8080",
 			ReadTimeout:  5 * time.Second,
@@ -67,7 +68,7 @@ func writeBaseConfig() {
 		Locations: map[string]location{
 			"/": {},
 			"/api": {
-				Upstream: &Upstream{
+				Upstream: &upstream{
 					Name: "backend-1",
 					Addr: []string{"127.0.0.1:8000", "127.0.0.1:8001"},
 				}},
@@ -79,7 +80,7 @@ func writeBaseConfig() {
 	defer f.Close()
 
 	enc := yaml.NewEncoder(f)
-	err = enc.Encode(SlbConfig)
+	err = enc.Encode(Config)
 	checkErr(err)
 }
 
@@ -88,7 +89,7 @@ func readConfigFile() {
 	checkErr(err)
 
 	dec := yaml.NewDecoder(file)
-	err = dec.Decode(&SlbConfig)
+	err = dec.Decode(&Config)
 	checkErr(err)
 }
 

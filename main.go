@@ -28,8 +28,8 @@ func main() {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
 
-	if SlbConfig.ShardCount <= runtime.NumCPU() {
-		runtime.GOMAXPROCS(SlbConfig.ShardCount)
+	if Config.ShardCount <= runtime.NumCPU() {
+		runtime.GOMAXPROCS(Config.ShardCount)
 	}
 	runtime.GOMAXPROCS(runtime.NumCPU())
 

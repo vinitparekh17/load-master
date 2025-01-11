@@ -34,7 +34,7 @@ type LocationHandler struct {
 func NewHandler(ctx context.Context) *RouteHandler {
 	rh := &RouteHandler{
 		mux:      http.NewServeMux(),
-		wp:       NewWorkerPool(SlbConfig.ShardCount, ctx),
+		wp:       NewWorkerPool(Config.ShardCount, ctx),
 		counter:  0,
 		handlers: make(map[string]*LocationHandler),
 	}
@@ -43,8 +43,8 @@ func NewHandler(ctx context.Context) *RouteHandler {
 }
 
 func (rh *RouteHandler) initializeHandlers() {
-	for path := range SlbConfig.Locations {
-		location := SlbConfig.Locations[path]
+	for path := range Config.Locations {
+		location := Config.Locations[path]
 		if location.Upstream != nil {
 			rh.handlers[path] = &LocationHandler{
 				handlerType: TypeProxy,
@@ -70,13 +70,13 @@ func (rh *RouteHandler) handleRequest(w http.ResponseWriter, r *http.Request) {
 
 	switch handler.handlerType {
 	case TypeProxy:
-		switch SlbConfig.LoadBalancingAlg {
+		switch Config.LoadBalancingAlg {
 		default:
-			addrLen := len(SlbConfig.Locations[handler.path].Upstream.Addr)
-			targetAddr := SlbConfig.Locations[handler.path].Upstream.Addr[0]
+			addrLen := len(Config.Locations[handler.path].Upstream.Addr)
+			targetAddr := Config.Locations[handler.path].Upstream.Addr[0]
 			if addrLen > 1 {
 				rh.counter = GetRoundRobinIndex(rh.counter, addrLen)
-				targetAddr = SlbConfig.Locations[handler.path].Upstream.Addr[rh.counter]
+				targetAddr = Config.Locations[handler.path].Upstream.Addr[rh.counter]
 				ProxyHandler(targetAddr)(w, r)
 			}
 			ProxyHandler(targetAddr)(w, r)

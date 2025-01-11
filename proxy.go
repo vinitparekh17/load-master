@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"strings"
 	"sync"
-	"time"
 )
 
 func ProxyHandler(target string) http.HandlerFunc {
@@ -26,30 +25,7 @@ func ProxyHandler(target string) http.HandlerFunc {
 	proxy := httputil.NewSingleHostReverseProxy(targetURL)
 
 	// Configure custom transport with timeouts
-	proxy.Transport = &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
-			Timeout:   5 * time.Second,
-			KeepAlive: 30 * time.Second,
-			Resolver: &net.Resolver{
-				PreferGo: true, // Using Go's built-in resolver
-				Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
-					d := net.Dialer{
-						Timeout: 2 * time.Second, // DNS timeout
-					}
-					return d.DialContext(ctx, network, address)
-				},
-			},
-		}).DialContext,
-		ForceAttemptHTTP2:     true,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   5 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-		MaxIdleConnsPerHost:   10,
-		MaxConnsPerHost:       10,
-		DisableCompression:    false,
-	}
+	proxy.Transport = NewTransport()
 
 	// Customize Director
 	proxy.Director = func(pr *http.Request) {
