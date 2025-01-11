@@ -22,7 +22,6 @@ const (
 type RouteHandler struct {
 	mux      *http.ServeMux
 	wp       *WorkerPool
-	counter  int
 	handlers map[string]*LocationHandler
 }
 
@@ -35,7 +34,6 @@ func NewHandler(ctx context.Context) *RouteHandler {
 	rh := &RouteHandler{
 		mux:      http.NewServeMux(),
 		wp:       NewWorkerPool(Config.ShardCount, ctx),
-		counter:  0,
 		handlers: make(map[string]*LocationHandler),
 	}
 	rh.initializeHandlers()
@@ -75,8 +73,8 @@ func (rh *RouteHandler) handleRequest(w http.ResponseWriter, r *http.Request) {
 			addrLen := len(Config.Locations[handler.path].Upstream.Addr)
 			targetAddr := Config.Locations[handler.path].Upstream.Addr[0]
 			if addrLen > 1 {
-				rh.counter = GetRoundRobinIndex(rh.counter, addrLen)
-				targetAddr = Config.Locations[handler.path].Upstream.Addr[rh.counter]
+				rr := NewRoundRobin(addrLen)
+				targetAddr = Config.Locations[handler.path].Upstream.Addr[rr.GetIndex()]
 				ProxyHandler(targetAddr)(w, r)
 			}
 			ProxyHandler(targetAddr)(w, r)

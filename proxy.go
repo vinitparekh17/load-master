@@ -13,7 +13,6 @@ import (
 )
 
 func ProxyHandler(target string) http.HandlerFunc {
-	// Create the proxy once, not per-request
 	targetURL, err := url.Parse(fmt.Sprintf("https://%s", target))
 	if err != nil {
 		slog.Error("Failed to parse target URL", "error", err)
@@ -27,20 +26,16 @@ func ProxyHandler(target string) http.HandlerFunc {
 	// Configure custom transport with timeouts
 	proxy.Transport = NewTransport()
 
-	// Customize Director
 	proxy.Director = func(pr *http.Request) {
-		pr.URL.Scheme = "https" // Keep HTTPS since target URL uses HTTPS
+		pr.URL.Scheme = "https" // TODO: make it dynamic depands on target scheme
 		pr.URL.Host = targetURL.Host
 		pr.Host = targetURL.Host
 
-		// Add standard proxy headers
 		pr.Header.Set("X-Forwarded-For", getClientIP(pr))
-		pr.Header.Set("X-Real-IP", getClientIP(pr))
 		pr.Header.Set("X-Forwarded-Proto", "https")
 		pr.Header.Set("X-Forwarded-Host", targetURL.Host)
 	}
 
-	// Add error handler
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		slog.Error("Proxy error",
 			"error", err,
@@ -54,13 +49,7 @@ func ProxyHandler(target string) http.HandlerFunc {
 		http.Error(w, "Bad Gateway", http.StatusBadGateway)
 	}
 
-	// Return the handler
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Log the incoming request
-		slog.Info("Proxying request",
-			"path", r.URL.Path,
-			"target", targetURL.Host)
-
 		proxy.ServeHTTP(w, r)
 	}
 }
@@ -78,8 +67,23 @@ func getClientIP(r *http.Request) string {
 	return ip
 }
 
-func GetRoundRobinIndex(currentIndex int, length int) int {
-	var mu sync.Mutex
-	mu.Lock()
-	return 1
+type RoundRobin struct {
+	mu           sync.Mutex
+	currentIndex int
+	length       int
+}
+
+func NewRoundRobin(length int) *RoundRobin {
+	if length <= 0 {
+		panic("length must be greater than 0")
+	}
+	return &RoundRobin{length: length}
+}
+
+func (rr *RoundRobin) GetIndex() int {
+	rr.mu.Lock()
+	index := rr.currentIndex % rr.length
+	rr.currentIndex = (rr.currentIndex + 1) % rr.length
+	rr.mu.Unlock()
+	return index
 }
